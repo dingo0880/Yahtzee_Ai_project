@@ -115,6 +115,7 @@ def weighted_choice(choices):
     return choices[-1][0] if choices else None
 
 def cpu_select_category_gambler(dice, scoreboard, turn_num, cpu_type):
+    """[버그 수정] 가중치 계산 시 실제 점수를 반영하도록 수정"""
     possible = [cat for cat, score in scoreboard.items() if score is None]
     if not possible: return "Chance"
     scores = {cat: score_category(dice, cat) for cat in possible}
@@ -134,21 +135,28 @@ def cpu_select_category_gambler(dice, scoreboard, turn_num, cpu_type):
     
     for cat in possible:
         score = scores[cat]
-        base_weight = 10
+        base_weight = 10.0 # float으로 초기화
+        
         if cat in ["Four of a Kind", "Yahtzee"]:
-            base_weight += prob_map[cpu_type]["HighValue"] * (score / 30)
+            base_weight += prob_map[cpu_type]["HighValue"] * (score / 30.0)
+        
         if cat in CATEGORIES[:6]:
             if upper_score < 63:
-                base_weight += prob_map[cpu_type]["UpperBonus"]
+                # [핵심 수정] 기본 가중치에 (1 + 실제 점수)를 곱하여 점수 가치를 반영
+                base_weight += prob_map[cpu_type]["UpperBonus"] * (1 + score)
                 if cpu_type == "안정형": base_weight += 20
+        
         if cat == "Chance":
             base_weight += prob_map[cpu_type]["Chance"]
             if score < 15: base_weight /= 4
+
         weights.append((cat, base_weight))
+
     return weighted_choice(weights)
 
 # --- AI 유형별 dispatcher 함수 ---
 def cpu_select_category_dispatcher(dice, scoreboard, cpu_type, turn):
+    """[오류 수정] CPU 유형에 따라 올바른 선택 함수를 호출하도록 수정"""
     if cpu_type == "엘리트형":
         return cpu_select_category_elite(dice, scoreboard, turn)
     else:

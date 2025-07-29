@@ -59,6 +59,8 @@ def calculate_upper_score(scoreboard):
 def calculate_bonus(upper_score):
     return 35 if upper_score >= 63 else 0
 
+# --- AI 핵심 두뇌 ---
+
 # --- '엘리트형' AI를 위한 고급 전략 함수 ---
 def dynamic_weights_elite(turn, scoreboard):
     w = BASE_WEIGHTS.copy()
@@ -77,23 +79,19 @@ def dynamic_weights_elite(turn, scoreboard):
     return w
 
 def cpu_select_category_elite(dice, scoreboard, turn):
-    """[엘리트형 전용] '희생' 전략이 포함된 족보 선택"""
     possible = [c for c, s in scoreboard.items() if s is None]
     if not possible: return "Chance"
-
     scores = {cat: score_category(dice, cat) for cat in possible}
 
     high_value_fixed = ["Yahtzee", "Large Straight", "Full House"]
     for cat in high_value_fixed:
         if cat in scores and scores[cat] > 0:
             return cat
-
     if "Small Straight" in scores and scores["Small Straight"] > 0 and turn <= 8:
         return "Small Straight"
 
     w = dynamic_weights_elite(turn, scoreboard)
     weighted_scores = sorted([(c, scores[c] * w.get(c, 1.0)) for c in possible], key=lambda x: x[1], reverse=True)
-    
     best_choice = weighted_scores[0][0]
     best_raw_score = scores[best_choice]
 
@@ -102,24 +100,9 @@ def cpu_select_category_elite(dice, scoreboard, turn):
         for sac_cat in sacrifice_priority:
             if scoreboard.get(sac_cat) is None and scores[sac_cat] == 0:
                 return sac_cat
-                
     return best_choice
 
-# --- [복구] '도박형' AI를 위한 규칙/확률 기반 로직 ---
-def find_best_straight_hold(dice):
-    unique_dice = sorted(set(dice))
-    if not unique_dice: return []
-    best_seq = []
-    current_seq = [unique_dice[0]]
-    for i in range(1, len(unique_dice)):
-        if unique_dice[i] == unique_dice[i-1] + 1:
-            current_seq.append(unique_dice[i])
-        else:
-            if len(current_seq) > len(best_seq): best_seq = current_seq
-            current_seq = [unique_dice[i]]
-    if len(current_seq) > len(best_seq): best_seq = current_seq
-    return best_seq
-
+# --- '도박형' 및 기타 AI를 위한 규칙/확률 기반 로직 ---
 def weighted_choice(choices):
     total = sum(weight for _, weight in choices)
     if total == 0: return choices[0][0] if choices else None
@@ -132,9 +115,9 @@ def weighted_choice(choices):
     return choices[-1][0] if choices else None
 
 def cpu_select_category_gambler(dice, scoreboard, turn_num, cpu_type):
+    """[버그 수정] 가중치 계산 시 실제 점수를 반영하도록 수정"""
     possible = [cat for cat, score in scoreboard.items() if score is None]
     if not possible: return "Chance"
-
     scores = {cat: score_category(dice, cat) for cat in possible}
     fixed_scores = {"Yahtzee": 50, "Large Straight": 30, "Full House": 25, "Small Straight": 15}
     for cat, score in fixed_scores.items():
@@ -145,28 +128,27 @@ def cpu_select_category_gambler(dice, scoreboard, turn_num, cpu_type):
         "안정형": {"HighValue": 60, "UpperBonus": 80, "Chance": 20},
         "공격형": {"HighValue": 80, "UpperBonus": 40, "Chance": 10},
         "일반형": {"HighValue": 70, "UpperBonus": 60, "Chance": 30},
+        "도박형": {"HighValue": 90, "UpperBonus": 30, "Chance": 5}
     }
     weights = []
-    
     upper_score = calculate_upper_score(scoreboard)
     
     for cat in possible:
         score = scores[cat]
-        base_weight = 10
+        base_weight = 10.0 # float으로 초기화
         
         if cat in ["Four of a Kind", "Yahtzee"]:
-            base_weight += prob_map[cpu_type]["HighValue"] * (score / 30)
+            base_weight += prob_map[cpu_type]["HighValue"] * (score / 30.0)
         
         if cat in CATEGORIES[:6]:
             if upper_score < 63:
-                base_weight += prob_map[cpu_type]["UpperBonus"]
-                if cpu_type == "안정형":
-                    base_weight += 20
+                # [핵심 수정] 기본 가중치에 (1 + 실제 점수)를 곱하여 점수 가치를 반영
+                base_weight += prob_map[cpu_type]["UpperBonus"] * (1 + score)
+                if cpu_type == "안정형": base_weight += 20
         
         if cat == "Chance":
             base_weight += prob_map[cpu_type]["Chance"]
-            if score < 15:
-                base_weight /= 4
+            if score < 15: base_weight /= 4
 
         weights.append((cat, base_weight))
 
@@ -174,22 +156,21 @@ def cpu_select_category_gambler(dice, scoreboard, turn_num, cpu_type):
 
 # --- AI 유형별 dispatcher 함수 ---
 def cpu_select_category_dispatcher(dice, scoreboard, cpu_type, turn):
+    """[오류 수정] CPU 유형에 따라 올바른 선택 함수를 호출하도록 수정"""
     if cpu_type == "엘리트형":
         return cpu_select_category_elite(dice, scoreboard, turn)
-    else: # 도박형, 공격형, 안정형, 일반형은 규칙/확률 기반 로직 사용
+    else:
         return cpu_select_category_gambler(dice, scoreboard, turn, cpu_type)
 
 # --- 몬테카를로 시뮬레이션 함수 ---
-def estimate_expected_score(dice, keep_idxs, scoreboard, turn, rolls_left, n_sim=500):
+def estimate_expected_score(dice, keep_idxs, scoreboard, turn, rolls_left, n_sim=200):
     total = 0
     for _ in range(n_sim):
         sim_dice = dice.copy()
         reroll_indices = [i for i in range(5) if i not in keep_idxs]
-        
         for _ in range(rolls_left):
             for i in reroll_indices:
                 sim_dice[i] = random.randint(1, 6)
-        
         best_cat = cpu_select_category_elite(sim_dice, scoreboard, turn)
         total += score_category(sim_dice, best_cat)
     return total / n_sim
@@ -201,7 +182,6 @@ def get_candidate_keeps(dice, scoreboard, turn):
     if counts:
         top = counts.most_common(1)[0][0]
         candidates.append([i for i, d in enumerate(dice) if d == top])
-    
     w = dynamic_weights_elite(turn, scoreboard)
     possible = [c for c, s in scoreboard.items() if s is None]
     if possible:
@@ -209,7 +189,6 @@ def get_candidate_keeps(dice, scoreboard, turn):
         if rec in CATEGORIES[:6]:
             face = CATEGORIES.index(rec) + 1
             candidates.append([i for i, d in enumerate(dice) if d == face])
-
     unique_cands = []
     for c in candidates:
         sorted_c = sorted(c)
@@ -232,11 +211,9 @@ def strategic_keep_gambler(dice, scoreboard):
         return [i for i,d in enumerate(dice) if d==counts.most_common(1)[0][0]]
     if scoreboard.get("Full House") is None and sorted(counts.values())==[2,3]:
         return list(range(5))
-    
     possible = [c for c, s in scoreboard.items() if s is None]
     if not possible: return list(range(5))
     tgt = max(possible, key=lambda c: score_category(dice, c) * BASE_WEIGHTS.get(c, 1.0))
-
     keep_indices = []
     if tgt in CATEGORIES[:6]:
         keep_indices = [i for i,d in enumerate(dice) if d==CATEGORIES.index(tgt)+1]
@@ -258,7 +235,6 @@ def strategic_keep_gambler(dice, scoreboard):
                 current_seq = [dice_set[i]]
         if len(current_seq) > len(best_seq): best_seq = current_seq
         if len(best_seq) >= 3: keep_indices = [i for i,d in enumerate(dice) if d in best_seq]
-    
     if not keep_indices and counts:
          keep_indices = [i for i,d in enumerate(dice) if d==counts.most_common(1)[0][0]]
     return keep_indices
@@ -269,7 +245,6 @@ def strategic_keep_attack(dice, scoreboard, turn):
         return [i for i, d in enumerate(dice) if d == counts.most_common(1)[0][0]]
     if scoreboard.get("Full House") is None and sorted(counts.values()) == [2, 3]:
         return list(range(5))
-    
     possible = [c for c, s in scoreboard.items() if s is None]
     if not possible: return []
     rec = max(possible, key=lambda c: score_category(dice, c) * BASE_WEIGHTS.get(c, 1.0))
@@ -303,7 +278,6 @@ def strategic_keep_normal(dice, scoreboard, turn):
             for pat in pats:
                 if set(pat).issubset(set(dice)):
                     return [i for i, d in enumerate(dice) if d in pat]
-
     possible = [c for c, s in scoreboard.items() if s is None]
     if not possible: return []
     rec = max(possible, key=lambda c: score_category(dice, c) * BASE_WEIGHTS.get(c, 1.0))
