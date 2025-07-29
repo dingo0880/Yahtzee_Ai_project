@@ -72,21 +72,41 @@ def dynamic_weights_elite(turn, scoreboard):
     return w
 
 def cpu_select_category_elite(dice, scoreboard, turn):
-    """[엘리트형 전용] '희생' 전략이 포함된 족보 선택"""
-    w = dynamic_weights_elite(turn, scoreboard)
+    """
+    [v2.1 수정] 단순 가중치 계산을 뛰어넘는 '최우선 순위 규칙'을 추가하여,
+    희귀하고 높은 가치의 족보를 놓치지 않도록 수정한 최종 선택 함수입니다.
+    """
     possible = [c for c, s in scoreboard.items() if s is None]
     if not possible: return "Chance"
 
-    weighted_scores = sorted([(c, score_category(dice, c) * w.get(c, 1.0)) for c in possible], key=lambda x: x[1], reverse=True)
+    scores = {cat: score_category(dice, cat) for cat in possible}
+
+    # --- 최우선 순위 규칙: '이건 무조건 잡아야 한다' ---
+    # 1. 야찌, 라지 스트레이트, 풀하우스가 나왔다면, 다른 어떤 것도 계산하지 말고 즉시 선택한다.
+    high_value_fixed = ["Yahtzee", "Large Straight", "Full House"]
+    for cat in high_value_fixed:
+        if cat in scores and scores[cat] > 0:
+            return cat
+
+    # 2. 스몰 스트레이트가 나왔다면, 초반(8턴 이전)에는 무조건 선택한다.
+    #    (후반에는 다른 더 높은 점수를 위해 포기할 수도 있음)
+    if "Small Straight" in scores and scores["Small Straight"] > 0 and turn <= 8:
+        return "Small Straight"
+
+    # --- 위의 경우가 아니라면, 기존의 가중치 기반 계산을 수행 ---
+    w = dynamic_weights_elite(turn, scoreboard)
+    weighted_scores = sorted([(c, scores[c] * w.get(c, 1.0)) for c in possible], key=lambda x: x[1], reverse=True)
     
     best_choice = weighted_scores[0][0]
-    best_raw_score = score_category(dice, best_choice)
+    best_raw_score = scores[best_choice]
 
+    # --- 마지막 방어선: '전략적 희생' 로직 ---
     if best_raw_score < 5 and turn < 11:
         sacrifice_priority = ["Yahtzee", "Ones", "Twos", "Chance"]
         for sac_cat in sacrifice_priority:
-            if scoreboard.get(sac_cat) is None and score_category(dice, sac_cat) == 0:
+            if scoreboard.get(sac_cat) is None and scores[sac_cat] == 0:
                 return sac_cat
+                
     return best_choice
 
 # --- [신규] '도박형' AI를 위한 기본 전략 함수 ---
