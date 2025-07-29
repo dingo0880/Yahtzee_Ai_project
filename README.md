@@ -48,6 +48,21 @@ Beyond simple game implementation, this is a journey to answer the fundamental q
 
 <br>
 
+
+## CPU Players with Distinct Personalities:
+
+    - 🤖 Elite (The Strategist): The final and most advanced AI in this project. It combines Monte Carlo simulation with advanced strategies (Strategic Sacrifice, Dynamic Weights) to find the mathematically optimal move in any situation. It is a strategist that achieves the highest and most stable average score.
+
+    - 🎰 Gambler (The Risk-Taker): A rule/probability-based AI. It mimics human intuition rather than pursuing mathematical optimization, resulting in unpredictable gameplay with high variance (high highs and low lows). It is a risk-taker.
+
+    - ⚔️ Aggressive (The Attacker): An aggressive AI that prioritizes high-scoring combinations in the lower section, such as Yahtzee and Full House.
+
+    - 🛡️ Defensive (The Planner): A stable AI that focuses on securing the 35-point upper section bonus as its primary goal.
+
+    - 🧐 Normal (The Standard): A balanced AI that prioritizes standard combinations like Straights and pairs.
+
+<br>
+
 ## 🛠️ Tech Stack
 
 -   **Language:** `Python`
