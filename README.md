@@ -1,103 +1,106 @@
-# 🎲 Yahtzee AI: A Journey from Rule-based Heuristics to Monte Carlo Simulation
+[Read this in Korean](./README.ko.md)
+
+# 🎲 Yahtzee AI: A Research Platform for Decision-Making Agents
 
 [![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-v2.5%20Completed-success)]()
-[![GitHub commits](https://img.shields.io/github/commits-since/dingo0880/Yahtzee_Ai_project/v2.5?label=Commits%20since%20v2.5)](https://github.com/dingo0880/Yahtzee_Ai_project/commits/main)
+[![Latest Commit](https://img.shields.io/github/last-commit/dingo0880/Yahtzee_Ai_project)](https://github.com/dingo0880/Yahtzee_Ai_project/commits/main)
 
-**AI의 의사결정 과정을 탐구하고, 더 나은 전략을 스스로 찾아내는 야찌(Yahtzee) 게임 AI를 개발하는 프로젝트입니다. 단순한 규칙 기반에서 시작하여, 치명적인 결함을 가진 몬테카를로 AI를 거쳐, 최종적으로는 완성도 사용자 친화 게임/시뮬레이션으로 진화하는 전 과정을 담고 있습니다.**
+**A research platform for developing AI agents that emulate and surpass human decision-making. This project uses the Yahtzee game environment to explore the evolution of strategic thinking in AI and to collect player data for machine learning models.**
 
 ---
 
 <br>
 
-## 🎬 프로젝트 시연 (Demonstration)
+## 🎬 Project Demonstration
 
-* **v2.5 최종 버전 플레이 시연**
+* **v2.5 Final Version Gameplay**
 
-    [여기에 최종 버전의 게임 플레이 GIF나 스크린샷을 넣어주세요. 엘리트형 CPU와 플레이하는 모습, 저장/이어하기 기능 등을 보여주면 좋습니다.]
+    ![v2.5 Gameplay Demo](./assets/play.gif)
 
-    ![Yathzee AI Gameplay Demo](링크_또는_이미지파일_경로)
+* **AI Performance Analysis Mode**
 
-<br>
-
-## 📖 프로젝트 소개 (Introduction)
-
-이 프로젝트는 단순한 게임 구현을 넘어, **"최적의 의사결정이란 무엇인가?"** 라는 질문에 답을 찾아가는 여정입니다. 초기에는 인간의 직감과 경험을 모방한 규칙 기반 AI를 설계했으나, 그 명백한 한계를 느끼고 수학적 최적화를 위해 몬테카를로 시뮬레이션(Monte Carlo Simulation)을 도입했습니다.
-
-이 과정에서 AI의 근본적인 설계 결함을 발견하고 해결하며, 단순한 기술의 적용을 넘어 **시스템의 내부 동작 원리를 깊이 있게 이해하는 경험**을 했습니다. 이 프로젝트는 현재 데이터 수집을 위한 웹 백엔드 구축 및 머신러닝 기반 AI v3.0 개발이라는 장기적인 비전의 첫 번째 초석입니다.
+    ![AI Performance Analysis](./assets/statistics.png)
 
 <br>
 
-## ✨ 주요 기능 (Key Features)
+## 📖 Introduction
 
-- **5단계에 걸친 AI 진화 모델:**
-    - **v0.1 (규칙/확률 기반):** 인간의 직감과 플레이 스타일을 모방한 '도박사' AI
-    - **v1.0 (결함 있는 MC):** 몬테카를로 시뮬레이션을 처음 도입했으나, '시간 개념'에 오류가 있었던 버전
-    - **v1.5 (결함 수정 MC):** v1.0의 근본적인 오류를 해결한, 최초의 정상 작동 시뮬레이션 AI
-    - **v2.0 (고급전략 사용 AI):** '희생 전략', '동적 가중치' 등 고급 전략을 탑재한 버전
-    - **v2.5 (최종 완성본):** 모든 편의 기능(저장/이어하기, 다시하기 등)이 추가된 완성형 애플리케이션
-- **다양한 게임 모드:** CPU 대전, 플레이어 간 대전, AI 성능 분석 모드 등 제공
-- **상태 저장 및 이어하기:** 게임 진행 상황을 `JSON` 파일로 저장하고, 언제든 이어서 플레이할 수 있는 기능
-- **게임 로그 저장:** 차후 머신러닝 모델 학습을 위한 데이터셋으로 활용하기 위해, 모든 플레이어의 행동을 `.txt` 파일로 자동 저장
+The ultimate goal of this project is to **develop a machine learning (ML) based AI agent that learns optimal strategies from human play data.** As a first step toward this goal, this Yahtzee application was built to serve as both a **data collection platform** and a **testbed** for evaluating AI performance.
+
+Beyond simple game implementation, this is a journey to answer the fundamental question: "What constitutes an optimal decision?" To establish **baseline models** for comparison with future ML agents, I progressively developed and analyzed the limitations of various AIs, from a rule-based model mimicking human intuition to a mathematically optimized Monte Carlo simulation agent.
 
 <br>
 
-## 🛠️ 기술 스택 (Tech Stack)
+## ✨ Key Features
 
-- **Language:** `Python`
-- **Libraries:** `Pandas`, `itertools`, `json`
+-   **Core Features for Data Collection:**
+    -   **Game Log Saving:** Automatically saves every player's `State` and `Action` to a `.txt` file for future use as an ML dataset.
+    -   **State Save & Load:** Saves and restores the complete game state using `JSON` files, facilitating long-term data collection and testing.
+-   **Evolution of AI Decision Models:**
+    -   **v0.1 (Rule/Probability-based):** A baseline AI mimicking human intuition and play styles.
+    -   **v1.0 (Flawed MC):** The initial implementation of Monte Carlo simulation, which contained a critical error in its perception of "time" (remaining rolls).
+    -   **v1.5 (Fixed MC):** The first correctly functioning simulation AI after resolving the fundamental flaw from v1.0.
+    -   **v2.0 (Advanced Strategy AI):** An enhanced version equipped with advanced strategies like 'Strategic Sacrifice' and 'Dynamic Weights'.
+-   **A Complete Experimental Environment:**
+    -   **Multiple Game Modes:** Provides diverse experimental setups, including Player vs. CPU, Player vs. Player, and CPU vs. CPU.
+    -   **v2.5 (Final Application):** A stable application with all convenience features added.
 
 <br>
 
-## ⚙️ 설치 및 실행 방법 (Installation & Usage)
+## 🛠️ Tech Stack
 
-1.  **레포지토리 클론:**
+-   **Language:** `Python`
+-   **Libraries:** `Pandas`, `itertools`, `json`
+
+<br>
+
+## ⚙️ Installation & Usage
+
+1.  **Clone the repository:**
     ```bash
     git clone [https://github.com/dingo0880/Yahtzee_Ai_project.git](https://github.com/dingo0880/Yahtzee_Ai_project.git)
     cd Yahtzee_Ai_project
     ```
-2.  **필요 라이브러리 설치:**
+2.  **Install necessary libraries:**
     ```bash
     pip install pandas
     ```
-3.  **프로그램 실행:**
+3.  **Run the program:**
     ```bash
     python yahtzee_ai.py
     ```
-    [실행 파일 이름이 다르다면 수정하세요.]
 
 <br>
 
-## 🧠 AI 개발 과정 및 핵심 로직 (AI Development Process)
+## 🧠 AI Development Process & Core Logic
 
-이 프로젝트의 핵심은 AI의 성장 과정입니다. 각 버전의 코드는 **[커밋 히스토리](https://github.com/dingo0880/Yahtzee_Ai_project/commits/main)** 에서 확인하실 수 있습니다.
+The core of this project is the evolutionary journey of the AI. The code for each version can be reviewed in the **[Commit History](https://github.com/dingo0880/Yahtzee_Ai_project/commits/main)**.
 
-### v0.1: 인간의 직감을 코드로 - 규칙 기반 AI
-초기 AI는 '공격형', '안정형' 등 인간의 플레이 스타일을 모방하기 위해 복잡한 규칙과 확률 가중치 시스템으로 설계되었습니다. 이는 예측 불가능한 플레이를 보여주었지만, 
-점수 획득치가 매우 낮고 뚜렷한 전략없이 맹목적으로 행동하는 모습을 보여주고있습니다.
+### v0.1: Translating Human Intuition into Code - The Rule-Based AI
+The initial AI was designed with a complex system of rules and probability weights to emulate human play styles like 'Aggressive' or 'Defensive'. While this produced unpredictable gameplay, it had a clear limitation of making greedy, short-sighted decisions and failing to find optimal plays.
 
-### v1.0 & v1.5: 더 높고 효율적인 의사결정을 위한 몬테카를로 시뮬레이션 도입
-규칙 기반의 한계를 넘어 수학적 최적화를 위해 몬테카를로 시뮬레이션을 처음 도입했습니다. 하지만 이 과정에서 AI가 **'남은 굴림 횟수'를 잘못 인지하는 치명적인 논리적 오류**를 발견했습니다. 이 실패의 원인을 분석하고, 시스템 전체에 `rolls_left` 상태 변수를 전달하도록 오류를 수정하여 비로소 정상적으로 작동하는 시뮬레이션 AI(v1.5)를 완성할 수 있었습니다.
+### v1.0 & v1.5: Adopting Monte Carlo Simulation for Higher-Level Decision Making
+To overcome the limitations of the rule-based approach, I first introduced Monte Carlo simulation for mathematical optimization. However, during this process, I discovered a **critical logical flaw where the AI miscalculated the 'number of remaining rolls.'** After analyzing this failure, I refactored the system architecture to pass a `rolls_left` state variable, finally completing a correctly functioning simulation AI (v1.5).
 
-### v2.0 ~ v2.5: AI설계에 끝나지않고, 사용자 친화적 기능을 도입하여 완전한 애플리케이션으로
-정상화된 시뮬레이션 AI에 **'동적 가중치'**와 **'전략적 희생'** 같은 고급 전략을 추가하여 AI의 두뇌를 완성했습니다(v2.0). 이후, 사용자의 편의성을 극대화하기 위해 **'저장/이어하기', '다시하기'** 등의 기능을 추가하여 하나의 완성된 소프트웨어(v2.5)로 프로젝트를 마무리했습니다.
+### v2.0 ~ v2.5: Beyond AI Design to a Complete, User-Friendly Application
+I completed the AI's "brain" by adding advanced strategies like **'Dynamic Weights'** and **'Strategic Sacrifice'** to the normalized simulation AI (v2.0). Subsequently, to maximize user convenience, I added features such as **'Save/Load' and 'Replay'**, finalizing the project as a complete piece of software (v2.5).
 
-
-> **[자세한 개발 과정 및 코드 분석 (블로그 링크)]**
+> **[Detailed Development Process & Code Analysis (Blog Link)]**
 
 <br>
 
-## 🚀 앞으로의 계획 (Future Plans)
+## 🚀 Future Plans
 
-- **[~202X.XX] v3.0: 데이터 수집 백엔드 구축**
-    - `Django`와 `MySQL`을 이용해 모든 플레이 로그를 중앙 데이터베이스에 자동으로 수집하는 API 서버를 구축할 계획입니다.
-- **[~202X.XX] v4.0: 머신러닝 기반 AI 개발**
-    - 수집된 '인간 고수'들의 플레이 데이터를 학습하여, 시뮬레이션 기반 AI를 뛰어넘는 새로운 머신러닝 기반의 '학습형 AI'를 개발하는 것을 최종 목표로 합니다.
+-   **Phase 2: Data Collection Backend Development**
+    -   I plan to build an API server using `Django` and `MySQL` to automate and scale the collection of all play logs into a central database.
+-   **Phase 3: Machine Learning-Based AI Development**
+    -   The ultimate goal is to develop a new 'learning-based AI' using the collected human player data, aiming to surpass the performance of the current simulation-based AI.
 
 <br>
 
-## 🤔 배우고 느낀 점 (What I Learned)
+## 🤔 What I Learned
 
-- **규칙 기반 AI의 명확한 한계:** 초기 AI를 설계하며, 인간의 복잡한 직감을 `if/else`와 확률로 모델링하는 것의 한계를 체감했습니다. 아무리 정교한 규칙을 추가해도 모든 예외 상황을 처리할 수 없었고, 이는 AI 성능의 불안정성으로 이어졌습니다.
-- **생성형 AI의 치명적인 오류:** 생성형 AI의 도움을 받아서 제작한 프로젝트이지만, 상당히 오점과 부족한점이 많아 결국 전체적인 디버깅과 버그해결, 코드설계는 개발자가 해야함을 느꼈습니다. 또한 혼자 게임룰을 수정하거나 코드를 누락하고, 멋대로 이상한 기능을 추가하는 등의 행동을 교정해나가는 프롬포트 입력의 학습시간이기도 하였습니다.
-- **버그 수정을 통한 시스템 아키텍처 이해:** '남은 굴림 횟수' 오류를 수정하는 과정은 단순히 한 줄을 고치는 것이 아니었습니다. 게임의 메인 루프부터 AI의 가장 깊은 예측 함수까지 상태 변수를 전달하기 위해 **시스템 전체의 데이터 흐름을 리팩토링**해야 했습니다. 이 경험을 통해 작은 논리 오류가 어떻게 전체 시스템 아키텍처에 영향을 미치는지 실질적으로 이해할 수 있었습니다.
+-   **The Clear Limitations of Rule-Based AI:** While designing the initial AI, I experienced the limits of modeling complex human intuition with `if/else` statements and probabilities. No matter how elaborate the rules, they could not cover all edge cases, leading to performance instability.
+-   **Collaboration with and Control over Generative AI:** Although this project was developed with the assistance of generative AI, I learned that the developer is ultimately responsible for the entire debugging, bug-fixing, and code design process. It was also a learning experience in prompt engineering to effectively control and direct the AI, correcting its tendencies to modify game rules, omit code, or add features arbitrarily.
+-   **Understanding System Architecture Through Bug Fixing:** Fixing the 'remaining rolls' bug was not a one-line change. It required **refactoring the data flow of the entire system**, from the main game loop down to the deepest prediction function, to pass a state variable. This experience provided a practical understanding of how a small logical error can impact the entire system architecture.
