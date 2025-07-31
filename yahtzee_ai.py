@@ -63,12 +63,14 @@ def calculate_bonus(upper_score):
 
 # --- '엘리트형' AI를 위한 고급 전략 함수 ---
 def dynamic_weights_elite(turn, scoreboard):
+    """[v2.2 수정] AI의 맹목적인 상단 집착 오류를 해결하기 위해, '긴급도 팩터'의 영향력을 조절"""
     w = BASE_WEIGHTS.copy()
     upper_score = calculate_upper_score(scoreboard)
     upper_categories_left = [c for c in CATEGORIES[:6] if scoreboard[c] is None]
 
     if upper_score < 63 and upper_categories_left:
-        urgency_factor = 1.0 + ((12 - turn) / 10.0)
+        # [핵심 수정] 긴급도 팩터의 영향력을 절반으로 줄여, 현재 점수의 가치를 더 존중하도록 변경
+        urgency_factor = 1.0 + ((12 - turn) / 20.0) 
         for cat in upper_categories_left:
             w[cat] *= (1.5 * urgency_factor)
 
