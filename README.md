@@ -101,7 +101,7 @@ To overcome the limitations of the rule-based approach, I first introduced Monte
 ### v2.0 ~ v2.5: Beyond AI Design to a Complete, User-Friendly Application
 I completed the AI's "brain" by adding advanced strategies like **'Dynamic Weights'** and **'Strategic Sacrifice'** to the normalized simulation AI (v2.0). Subsequently, to maximize user convenience, I added features such as **'Save/Load' and 'Replay'**, finalizing the project as a complete piece of software (v2.5).
 
-> **[Detailed Development Process & Code Analysis (Blog Link)]**
+> **[https://blog.naver.com/dingo0880/223925538295]**
 
 <br>
 
